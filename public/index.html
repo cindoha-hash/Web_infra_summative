@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Market Explorer — Real-Time Insights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --border-light: #f1f5f9;
+      --success: #059669;
+      --success-bg: #ecfdf5;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+    
+    * { margin:0; padding:0; box-sizing:border-box; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* ── Header ── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 2rem;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .brand-text h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .brand-text span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    
+    /* ── Navigation ── */
+    .nav {
+      display: flex;
+      gap: 0.25rem;
+      background: var(--border-light);
+      padding: 0.25rem;
+      border-radius: var(--radius);
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .nav-btn.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-btn:hover:not(.active) {
+      color: var(--text);
+    }
+    
+    /* ── Main ── */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    /* ── Search Bar ── */
+    .search-bar {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .search-bar input[type="text"] {
+      flex: 2;
+      min-width: 220px;
+      padding: 0.625rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+    .search-bar input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .search-bar select {
+      padding: 0.625rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-family: inherit;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      outline: none;
+      min-width: 160px;
+    }
+    .search-bar select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .checkbox-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+    
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:active { transform: scale(0.97); }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border-light); }
+    
+    /* ── Job Cards ── */
+    .jobs-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .job-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .job-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+    .job-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .job-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .job-company {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+    .job-salary {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--success);
+      background: var(--success-bg);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .job-meta {
+      display: flex;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: 0.5rem 0;
+    }
+    .job-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .job-snippet {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 0.5rem 0;
+      line-height: 1.5;
+    }
+    .job-skills {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin: 0.6rem 0;
+    }
+    .skill-tag {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 0.15rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .job-apply {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: gap 0.15s;
+    }
+    .job-apply:hover { gap: 0.6rem; }
+    
+    /* ── Stats Cards ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+    }
+    .stat-card .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .stat-card .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .stat-card .stat-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    
+    /* ── Skill Bars ── */
+    .skill-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .skill-row .skill-name {
+      width: 110px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+    .skill-row .bar-track {
+      flex: 1;
+      height: 6px;
+      background: var(--border-light);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .skill-row .bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+    .skill-row .skill-count {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      width: 28px;
+      text-align: right;
+    }
+    
+    /* ── Salary Display ── */
+    .salary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+    }
+    .salary-amount {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--success);
+      letter-spacing: -0.03em;
+    }
+    .salary-details {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .salary-detail dt {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .salary-detail dd {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 0.2rem;
+    }
+    
+    /* ── Section Headers ── */
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+      letter-spacing: -0.02em;
+    }
+    .section-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    
+    /* ── Utilities ── */
+    .loader {
+      display: none;
+      text-align: center;
+      padding: 3rem 0;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .error-toast {
+      display: none;
+      background: var(--danger-bg);
+      border: 1px solid #fecaca;
+      color: var(--danger);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    .info-bar {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+    
+    @media (max-width: 768px) {
+      .header-inner { flex-direction: column; height: auto; padding: 0.75rem 0; gap: 0.75rem; }
+      main { padding: 1rem; }
+      .job-card-header { flex-direction: column; }
+      .salary-amount { font-size: 2.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">JM</div>
+        <div class="brand-text">
+          <h1>Job Market Explorer</h1>
+          <span>Real-time insights &amp; analytics</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-tab="search">Search</button>
+        <button class="nav-btn" data-tab="salary">Salary</button>
+        <button class="nav-btn" data-tab="analytics">Analytics</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- SEARCH TAB -->
+    <div id="tab-search">
+      <div class="search-bar">
+        <input type="text" id="search-query" placeholder="Job title, skill, or keyword..." autofocus>
+        <select id="search-location">
+          <option value="us">United States</option>
+          <option value="gb">United Kingdom</option>
+          <option value="ca">Canada</option>
+          <option value="de">Germany</option>
+          <option value="fr">France</option>
+        </select>
+        <label class="checkbox-label">
+          <input type="checkbox" id="search-remote"> Remote only
+        </label>
+        <button class="btn" id="btn-search">Search Jobs</button>
+      </div>
+      <div id="search-error" class="error-toast"></div>
+      <div id="search-info" class="info-bar"></div>
+      <div id="jobs-container" class="jobs-grid"></div>
+      <div id="search-loader" class="loader"><div class="spinner"></div></div>
+    </div>
+
+    <!-- SALARY TAB -->
+    <div id="tab-salary" style="display:none;">
+      <h2 class="section-title">Salary Explorer</h2>
+      <p class="section-subtitle">Estimated pay data from Glassdoor for any role and location</p>
+      <div class="search-bar">
+        <input type="text" id="salary-role" placeholder="Job title (e.g. Cloud Architect)">
+        <input type="text" id="salary-loc" placeholder="Location (e.g. Seattle)">
+        <button class="btn" id="btn-salary">Get Estimate</button>
+      </div>
+      <div id="salary-error" class="error-toast"></div>
+      <div id="salary-result"></div>
+      <div id="salary-loader" class="loader"><div class="spinner"></div></div>
+    </div>
+
+    <!-- ANALYTICS TAB -->
+    <div id="tab-analytics" style="display:none;">
+      <h2 class="section-title">Market Analytics</h2>
+      <p class="section-subtitle">Live data aggregated from current developer job listings across the United States</p>
+      <div id="analytics-error" class="error-toast"></div>
+      <div id="analytics-content"></div>
+      <div id="analytics-loader" class="loader"><div class="spinner"></div></div>
+    </div>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
