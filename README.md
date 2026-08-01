@@ -38,3 +38,7 @@ Clone the repository and install dependencies.
 git clone https://github.com/cindoha-hash/Web_infra_summative
 cd job-dashboard
 npm install
+
+### Video Presentation
+
+video_url:https://www.youtube.com/watch?v=ldmPhS6VkJ4
